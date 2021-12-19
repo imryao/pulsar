@@ -20,7 +20,6 @@ package org.apache.pulsar.testclient;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.pulsar.testclient.utils.PerformanceUtils.buildTransaction;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
@@ -362,8 +361,13 @@ public class PerformanceConsumer {
         }
         PulsarClient pulsarClient = clientBuilder.build();
 
-        AtomicReference<Transaction> atomicReference = buildTransaction(pulsarClient, arguments.isEnableTransaction,
-                arguments.transactionTimeout);
+        AtomicReference<Transaction> atomicReference;
+        if (arguments.isEnableTransaction) {
+            atomicReference = new AtomicReference<>(pulsarClient.newTransaction()
+                    .withTransactionTimeout(arguments.transactionTimeout, TimeUnit.SECONDS).build().get());
+        } else {
+            atomicReference = new AtomicReference<>(null);
+        }
 
         AtomicLong messageAckedCount = new AtomicLong();
         Semaphore messageReceiveLimiter = new Semaphore(arguments.numMessagesPerTransaction);
@@ -372,7 +376,6 @@ public class PerformanceConsumer {
                 if (arguments.testTime > 0) {
                     if (System.nanoTime() > testEndTime) {
                         log.info("------------------- DONE -----------------------");
-                        printAggregatedStats();
                         PerfClientUtils.exit(0);
                         thread.interrupt();
                     }
@@ -380,7 +383,6 @@ public class PerformanceConsumer {
                 if (arguments.totalNumTxn > 0) {
                     if (totalEndTxnOpFailNum.sum() + totalEndTxnOpSuccessNum.sum() >= arguments.totalNumTxn) {
                         log.info("------------------- DONE -----------------------");
-                        printAggregatedStats();
                         PerfClientUtils.exit(0);
                         thread.interrupt();
                     }

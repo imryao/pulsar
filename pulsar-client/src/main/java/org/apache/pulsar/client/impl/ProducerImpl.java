@@ -386,6 +386,10 @@ public class ProducerImpl<T> extends ProducerBase<T> implements TimerTask, Conne
         if (txn == null) {
             return internalSendAsync(message);
         } else {
+            CompletableFuture<MessageId> completableFuture = new CompletableFuture<>();
+            if (!((TransactionImpl)txn).checkIfOpen(completableFuture)) {
+               return completableFuture;
+            }
             return ((TransactionImpl) txn).registerProducedTopic(topic)
                         .thenCompose(ignored -> internalSendAsync(message));
         }
@@ -500,6 +504,11 @@ public class ProducerImpl<T> extends ProducerBase<T> implements TimerTask, Conne
         } catch (Throwable t) {
             completeCallbackAndReleaseSemaphore(uncompressedSize, callback, new PulsarClientException(t, msg.getSequenceId()));
         }
+    }
+
+    @Override
+    public int getNumOfPartitions() {
+        return 0;
     }
 
     private void serializeAndSendMessage(MessageImpl<?> msg, ByteBuf payload,
