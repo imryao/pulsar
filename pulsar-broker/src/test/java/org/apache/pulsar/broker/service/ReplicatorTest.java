@@ -1120,7 +1120,7 @@ public class ReplicatorTest extends ReplicatorTestBase {
 
     @DataProvider(name = "topicPrefix")
     public static Object[][] topicPrefix() {
-        return new Object[][] { { "persistent://" , "/persistent" }, { "non-persistent://" , "/non-persistent" } };
+        return new Object[][] { { "persistent://", "/persistent" }, { "non-persistent://", "/non-persistent" } };
     }
 
     @Test(dataProvider = "topicPrefix")
@@ -1317,7 +1317,6 @@ public class ReplicatorTest extends ReplicatorTestBase {
         });
         cleanup();
         setup();
-
     }
 
     private void initTransaction(int coordinatorSize, PulsarAdmin admin, String ServiceUrl,

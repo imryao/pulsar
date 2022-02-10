@@ -228,16 +228,16 @@ Options
 
 |Flag|Description|Default|
 |---|---|---|
-|`--configuration-store`|Configuration store connection string||
-|`-zk` , `--zookeeper-servers`|Local ZooKeeper connection string||
+|`-cms`, `--configuration-metadata-store`|Configuration meta store connection string||
+|`-md` , `--metadata-store`|Metadata Store service url||
 
 Example
 
 ```bash
 
 $ PULSAR_PROXY_CONF=/path/to/proxy.conf pulsar proxy \
-  --zookeeper-servers zk-0,zk-1,zk2 \
-  --configuration-store zk-0,zk-1,zk-2
+  --metadata-store zk:my-zk-1:2181,my-zk-2:2181,my-zk-3:2181 \
+  --configuration-metadata-store zk:my-zk-1:2181,my-zk-2:2181,my-zk-3:2181
 
 ```
 
@@ -391,6 +391,7 @@ Options
 |`-p`, `--properties`|Properties to add. If you want to add multiple properties, use the comma as the separator, e.g. `k1=v1,k2=v2`.| |
 |`-ekn`, `--encryption-key-name`|The public key name to encrypt payload.| |
 |`-ekv`, `--encryption-key-value`|The URI of public key to encrypt payload. For example, `file:///path/to/public.key` or `data:application/x-pem-file;base64,*****`.| |
+|`-dr`, `--disable-replication`|Disable geo-replication for messages|false|
 
 
 ### `consume`
